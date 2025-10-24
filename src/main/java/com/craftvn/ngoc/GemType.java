@@ -1,4 +1,3 @@
-
 package com.craftvn.ngoc;
 
 import org.bukkit.Material;
@@ -10,8 +9,9 @@ public enum GemType {
     HOI_PHUC("&aNgọc Hồi Phục", "Full máu + Regen I 15s", 30, Material.DIAMOND, 5, 60, true, 0),
     SINH_MENH("&aNgọc Sinh Mệnh", "+2 thanh máu (tối đa 10p)", 50, Material.NETHERITE_BLOCK, 1, 120, false, 10),
 
-    
-    TANG_MAU(\"&cNgọc Tăng Máu\", \"Tăng 2 hàng máu trong 2 phút (CD 30s). Ngọc tự hủy sau 20 phút.\", 20, org.bukkit.Material.BEACON, 5, 30, false, 20),
+    // NGỌC MỚI
+    TANG_MAU("&cNgọc Tăng Máu", "Tăng 2 hàng máu trong 2 phút (CD 30s). Ngọc tự hủy sau 20 phút.", 20, Material.BEACON, 5, 30, false, 20),
+
     CUONG_NO("&cNgọc Cuồng Nộ", "Strength II 15s rồi Weakness 10s", 20, Material.IRON_BLOCK, 16, 40, true, 0),
     HAC_AM("&cNgọc Hắc Ám", "Wither II 5s + Blindness 3s (5 block)", 30, Material.DIAMOND, 3, 40, true, 0),
     TRI_TRE("&cNgọc Trì Trệ", "Slowness II + Fatigue 5s (7 block)", 30, Material.DIAMOND_BLOCK, 1, 40, true, 0),
@@ -32,7 +32,8 @@ public enum GemType {
     private final boolean consumeOnUse;
     private final Material requirement;
 
-    GemType(String display, String desc, int expCost, Material requirement, int amount, int cooldownSec, boolean consumeOnUse, int expireMinutes){
+    GemType(String display, String desc, int expCost, Material requirement, int amount,
+            int cooldownSec, boolean consumeOnUse, int expireMinutes){
         this.display = display; this.desc = desc;
         this.expCost = expCost; this.requirement = requirement; this.amount = amount;
         this.cooldownSec = cooldownSec; this.consumeOnUse = consumeOnUse; this.expireMinutes = expireMinutes;
