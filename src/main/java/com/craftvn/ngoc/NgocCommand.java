@@ -1,8 +1,6 @@
-
 package com.craftvn.ngoc;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.geysermc.floodgate.api.FloodgateApi;
@@ -17,13 +15,15 @@ public class NgocCommand implements CommandExecutor {
         if (cmd.getName().equalsIgnoreCase("muangoc")){
             try{
                 if (FloodgateApi.getInstance().isFloodgatePlayer(p.getUniqueId())){
+                    // Bedrock: mở form
                     PEFormUI.openMainForm(p, manager);
                 } else {
-                    PCGui.openMainForm(p, manager);
+                    // PC (Java): mở Chest GUI
+                    PCGui.openMainMenu(p, manager);
                 }
             } catch (Throwable t){
-                // nếu Floodgate không có -> fallback GUI PC
-                PCGui.openMainForm(p, manager);
+                // Nếu không có Floodgate -> fallback về Chest GUI
+                PCGui.openMainMenu(p, manager);
             }
             return true;
         }
