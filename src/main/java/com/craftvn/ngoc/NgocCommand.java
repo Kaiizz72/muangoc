@@ -7,9 +7,12 @@ import org.geysermc.floodgate.api.FloodgateApi;
 
 public class NgocCommand implements CommandExecutor {
     private final GemManager manager;
-    private final PCGui pcGui = new PCGui(); // <— thêm dòng này
+    private final PCGui pcGui; // <— có field instance
 
-    public NgocCommand(GemManager m){ this.manager = m; }
+    public NgocCommand(GemManager m){
+        this.manager = m;
+        this.pcGui = new PCGui(m); // <— TRUYỀN GemManager vào constructor PCGui
+    }
 
     @Override public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
         if (!(sender instanceof Player p)){ sender.sendMessage("Chỉ người chơi mới dùng lệnh này."); return true; }
@@ -17,15 +20,15 @@ public class NgocCommand implements CommandExecutor {
         if (cmd.getName().equalsIgnoreCase("muangoc")){
             try{
                 if (FloodgateApi.getInstance().isFloodgatePlayer(p.getUniqueId())){
-                    // Bedrock: Form
+                    // Bedrock (PE): dùng Form
                     PEFormUI.openMainForm(p, manager);
                 } else {
-                    // PC: Chest GUI
-                    pcGui.openMainMenu(p, manager); // <— đổi từ PCGui.openMainMenu(...) thành pcGui.openMainMenu(...)
+                    // PC (Java): dùng Chest GUI
+                    pcGui.openMainMenu(p, manager);
                 }
             } catch (Throwable t){
                 // nếu không có Floodgate -> fallback GUI PC
-                pcGui.openMainMenu(p, manager);     // <— đổi tương tự ở đây
+                pcGui.openMainMenu(p, manager);
             }
             return true;
         }
