@@ -379,50 +379,51 @@ public class GemManager {
     }
 
     // ====== Lồng kính thông minh ======
-    private void makeGlassCageSmart(Location around, int radius, int height, int seconds){
-        List<Block> placed = new ArrayList<>();
-        World w = around.getWorld();
-        int bx = around.getBlockX();
-        int bz = around.getBlockZ();
+    // ====== Lồng kính thông minh (mũ úp: có tường + mái, KHÔNG có sàn) ======
+private void makeGlassCageSmart(Location around, int radius, int height, int seconds){
+    List<Block> placed = new ArrayList<>();
+    World w = around.getWorld();
+    int bx = around.getBlockX();
+    int bz = around.getBlockZ();
 
-        int baseY;
-        Block feet = w.getBlockAt(bx, around.getBlockY(), bz);
-        if (feet.getType().isAir()) baseY = w.getHighestBlockYAt(bx, bz);
-        else baseY = feet.getY();
-        baseY = Math.min(Math.max(baseY, w.getMinHeight() + 1), w.getMaxHeight() - height - 2);
-        Location base = new Location(w, bx + 0.5, baseY + 1, bz + 0.5);
+    // Chọn cao độ hợp lý (nếu đang trên không thì bám ground gần nhất; không ép đặt sàn)
+    int baseY;
+    Block feet = w.getBlockAt(bx, around.getBlockY(), bz);
+    if (feet.getType().isAir()) baseY = w.getHighestBlockYAt(bx, bz);
+    else baseY = feet.getY();
+    baseY = Math.min(Math.max(baseY, w.getMinHeight() + 1), w.getMaxHeight() - height - 2);
+    Location base = new Location(w, bx + 0.5, baseY + 1, bz + 0.5);
 
-        // dọn khoảng trống trong lồng
-        for (int x=-radius+1;x<=radius-1;x++)
-            for (int y=0;y<height;y++)
-                for (int z=-radius+1;z<=radius-1;z++){
-                    Block b = w.getBlockAt(base.clone().add(x,y,z));
-                    if (!b.getType().isAir()) b.setType(Material.AIR,false);
-                }
+    // Dọn khoảng trống trong lồng (không đụng tới sàn tự nhiên)
+    for (int x=-radius+1;x<=radius-1;x++)
+        for (int y=0;y<height;y++)
+            for (int z=-radius+1;z<=radius-1;z++){
+                Block b = w.getBlockAt(base.clone().add(x,y,z));
+                if (!b.getType().isAir()) b.setType(Material.AIR,false);
+            }
 
-        // sàn + mái
+    // MÁI
+    for (int x=-radius;x<=radius;x++)
+        for (int z=-radius;z<=radius;z++){
+            Block roof = w.getBlockAt(base.clone().add(x,height,z));
+            if (roof.getType()==Material.AIR){ roof.setType(Material.GLASS,false); placed.add(roof); }
+        }
+
+    // TƯỜNG (không làm sàn)
+    for (int y=0;y<=height;y++)
         for (int x=-radius;x<=radius;x++)
             for (int z=-radius;z<=radius;z++){
-                Block floor = w.getBlockAt(base.clone().add(x,0,z));
-                if (floor.getType()==Material.AIR){ floor.setType(Material.GLASS,false); placed.add(floor); }
-                Block roof = w.getBlockAt(base.clone().add(x,height,z));
-                if (roof.getType()==Material.AIR){ roof.setType(Material.GLASS,false); placed.add(roof); }
+                boolean wall = (Math.abs(x)==radius || Math.abs(z)==radius);
+                if (!wall) continue;
+                Block b = w.getBlockAt(base.clone().add(x,y,z));
+                if (b.getType()==Material.AIR){ b.setType(Material.GLASS,false); placed.add(b); }
             }
-        // tường
-        for (int y=0;y<=height;y++)
-            for (int x=-radius;x<=radius;x++)
-                for (int z=-radius;z<=radius;z++){
-                    boolean wall = (Math.abs(x)==radius || Math.abs(z)==radius);
-                    if (!wall) continue;
-                    Block b = w.getBlockAt(base.clone().add(x,y,z));
-                    if (b.getType()==Material.AIR){ b.setType(Material.GLASS,false); placed.add(b); }
-                }
 
-        new BukkitRunnable(){ @Override public void run(){
-            for(Block b: placed) if (b.getType()==Material.GLASS) b.setType(Material.AIR,false);
-        }}.runTaskLater(plugin, 20L*seconds);
-    }
-
+    // Tự xoá lồng sau 'seconds'
+    new BukkitRunnable(){ @Override public void run(){
+        for(Block b: placed) if (b.getType()==Material.GLASS) b.setType(Material.AIR,false);
+    }}.runTaskLater(plugin, 20L*seconds);
+}
     // ====== Cạm bẫy: đặt tơ nhện lên mục tiêu ======
     private List<Block> placeCobwebOn(Player t, int radius) {
         List<Block> placed = new ArrayList<>();
@@ -441,7 +442,7 @@ public class GemManager {
                 for (int z = -radius; z <= radius; z++){
                     if (Math.abs(x) + Math.abs(z) != 2) continue;
                     for (int dy = 0; dy <= 1; dy++){
-                        Block b = w.getBlockAt(bx + x, by + dy, bz + z);
+                        Block b = w.getBlockAt(bx + x, by + dy,bz + z);
                         if (b.getType().isAir()) { b.setType(Material.COBWEB, false); placed.add(b); }
                     }
                 }
